@@ -1,0 +1,109 @@
+Project : Healthcare cost analysis
+From : Vivek Srivastava
+
+
+Import data into R environment.
+
+```{r}
+hosp<-read.csv("HospitalCosts.csv") 
+```
+
+```{r}
+head(hosp, n=3)
+```
+
+1. To record the patient statistics, the agency wants to find the age category of people who frequent the hospital and has the maximum expenditure.
+
+```{r}
+hist(hosp$AGE,main = "Frequency of patients",col = "aquamarine",xlab = "Age") 
+
+```
+```{r}
+attach(hosp) 
+AGE<-as.factor(AGE) 
+summary(AGE)
+```
+
+Conclusion 1: From the above results we conclude that infant category h as the max hospital visits (above 300). The summary of Age gives us the exact numerical output showing that Age 0 patients have the max visits followed by Ages 15-17. 
+
+```{r}
+aggregate(TOTCHG~AGE,FUN=sum,data = hosp) 
+```
+
+```{r}
+max(aggregate(TOTCHG~AGE,FUN=sum,data=hosp)) 
+```
+Conclusion 2: Thus, we can conclude that the infants also have the maximum hospital costs followed by Age groups 15 to 17, additionally we can say confidently that number of hospital visits are proportional to hospital costs. 
+
+2. In order of severity of the diagnosis and treatments and to find out the expensive treatments, the agency wants to find the diagnosis related group that has maximum hospitalization and expenditure. 
+
+```{r}
+hist(APRDRG,col = "cyan1",main = "Frequency of Treatments",xlab = "Trea tment Categories") 
+```
+```{r}
+APRDRG_fact<-as.factor(hosp$APRDRG) 
+summary(APRDRG_fact) 
+```
+```{r}
+which.max(summary(APRDRG_fact)) 
+```
+```{r}
+df<-aggregate(TOTCHG~APRDRG,FUN = sum,data=hosp) 
+df 
+```
+
+```{r}
+df[which.max(df$TOTCHG),] 
+```
+
+Conclusion: Hence can conclude that category 640 has the maximum hospitalizations by a huge number (267 out of 500), along with this it also has the highest hospitalization cost. 
+
+3. To make sure that there is no malpractice, the agency needs to analyze if the race of the patient is related to the hospitalization costs. 
+
+```{r}
+hosp<-na.omit(hosp)
+
+#first we remove "NA"values 
+hosp$RACE<-as.factor(hosp$RACE) 
+model_aov<-aov(TOTCHG~RACE,data = hosp) 
+model_aov#ANOVA RESULTS 
+```
+```{r}
+summary(model_aov) 
+```
+```{r}
+summary(hosp$RACE)#getting max hospital cost per race 
+```
+Conclusion: F value is quite low, which means that variation between hospital costs among different races is much smaller than the variation of hospital costs within each race, and P value being quite high shows that there is no relationship between race and hospital costs, thereby accepting the Null hypothesis. Additionally, we have more data for Race 1 in comparison to other races (484 out of 500 patients) which make the observations skewed and thus all we can say is that there isn’t enough data to verify whether race of a patient affects hospital costs. 
+
+4. To properly utilize the costs, the agency has to analyze the severity of the hospital costs by age and gender for proper allocation of resources.  
+
+```{r}
+hosp$FEMALE<-as.factor(hosp$FEMALE) 
+model_lm4<-lm(TOTCHG~AGE+FEMALE,data = hosp)
+#calling Regression funtion 
+summary(model_lm4) 
+```
+```{r}
+summary(hosp$FEMALE) #comapring genders 
+```
+Conclusion-Age has more impact than gender according to the P-values and significant levels, also there are equal number of Females and Males and on an average (based on the negative coefficient values) females incur lesser hospital costs than   males.
+
+5. Since the length of stay is the crucial factor for inpatients, the agency wants to find if the length of stay can be predicted from age, gender, and race. 
+
+
+```{r}
+hosp$RACE<-as.factor(hosp$RACE) 
+model_lm5<-lm(LOS~AGE+FEMALE+RACE,data = hosp) 
+summary(model_lm5) 
+```
+
+Conclusion-p-values for all independent variables are quite high thus signifying that there is no linear relationship between the given variables, finally concluding the fact that we can’t predict length of stay of a patient based on age, gender and race. 
+
+6. To perform a complete analysis, the agency wants to find the variable that mainly affects the hospital costs.  
+
+```{r}
+model_lm6<-lm(TOTCHG~AGE+FEMALE+RACE+LOS+APRDRG,data = hosp) 
+summary(model_lm6) 
+```
+Conclusion-Age and length of stay affect the total hospital costs. Additionally, there is positive relationship between length of stay to the cost, so with an increase of 1 day there is an addition of a value of 742 to the cost.  
