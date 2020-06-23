@@ -73,7 +73,6 @@ Bridge Highway Direction 	(Plain text)  - Empty Field
 Road Ramp 	(Plain text)  - Empty Field
 Bridge Highway Segment 	(Plain text)  - Empty Field
 Garage Lot Name 	(Plain text)  - Empty Field
- 
 Ferry Direction 	(Plain text)  - Empty Field
 Ferry Terminal Name 	(Plain text)  - Empty Field
 Latitude 	(Number) - Latitude of the location
